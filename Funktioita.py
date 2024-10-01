@@ -54,3 +54,11 @@ def get_4_random_airports():
 def calculate_final_points(points, distance_travelled):
     final_points = points - (distance_travelled // 2_000)
     return final_points
+
+# funktio lisää pelaajan nimen ja hänen pisteet tietokantaan.
+def screen_name_and_points(name,points):
+    sql = f"INSERT INTO scoreboard (screen_name,points) VALUES ('{name}','{points}')"
+    kursori = yhteys.cursor()
+    kursori.execute(sql)
+    yhteys.commit()
+    return
