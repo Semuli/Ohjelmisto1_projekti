@@ -47,34 +47,6 @@ def update_game_current_location(newLocation):
 def distance_between_airfields(airfield1, airfield2):
     print("dapetidap")
 
-# funktio lisää pelaajan nimen ja hänen pisteet tietokantaan.
-def screen_name_and_points(name,points):
-    sql = f"INSERT INTO scoreboard (screen_name,points) VALUES ('{name}','{points}')"
-    kursori = yhteys.cursor()
-    kursori.execute(sql)
-    yhteys.commit()
-    return
-# Funktio, joka näyttää TOP-10 pelaajaa.
-
-def TOP_10_PLAYERS():
-    sql = f"Select screen_name, points from scoreboard order by points desc limit 10"
-    kursori = yhteys.cursor()
-    kursori.execute(sql)
-    result = kursori.fetchall()
-    return result
-
-command = input("Do you want to know the TOP-10 players? \nEnter Y = yes or N = no \n: ").upper()
-while command != 'Y' and command != 'N':
-    print("Please enter Y or N")
-    command = input("").upper()
-
-if command == "Y":
-    top_10_players = TOP_10_PLAYERS()
-    for player in top_10_players:
-        print(f"Name: {player[0]}, Points: {player[1]}")
-elif command == "N":
-    enter = input("press enter")
-
 # sql yhteys ???
 yhteys = mysql.connector.connect(
          host = '127.0.0.1',
