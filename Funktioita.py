@@ -62,3 +62,23 @@ def screen_name_and_points(name,points):
     kursori.execute(sql)
     yhteys.commit()
     return
+
+# funktio, joka näyttää TOP-10 pelaajaa.
+def TOP_10_PLAYERS():
+    sql = f"Select screen_name, points from scoreboard order by points desc limit 10"
+    kursori = yhteys.cursor()
+    kursori.execute(sql)
+    result = kursori.fetchall()
+    return result
+
+command = input("Do you want to know the TOP-10 players? \nEnter Y = yes or N = no \n: ").upper()
+while command != 'Y' and command != 'N':
+    print("Please enter Y or N")
+    command = input("").upper()
+
+if command == "Y":
+    top_10_players = TOP_10_PLAYERS()
+    for player in top_10_players:
+        print(f"Name: {player[0]}, Points: {player[1]}")
+elif command == "N":
+    enter = input("press enter")
