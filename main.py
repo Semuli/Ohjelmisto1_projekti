@@ -1,7 +1,6 @@
 import csv
 import random
 import mysql.connector
-import config
 
 # Sattumatapahtumien satunnaishaku
 def pick_random_event():
@@ -48,7 +47,7 @@ yhteys = mysql.connector.connect(
          host = '127.0.0.1',
          port = 3306,
          database = 'demo_game',
-         user = config.user,
-         password = config.password,
+         user = user,
+         password = password,
          autocommit = True
          )
