@@ -2,6 +2,12 @@ import csv
 import random
 import mysql.connector
 
+# kirjautuminen
+def sql_user_and_password():
+    user = input('SQL user: ')
+    pw = input('SQL Password: ')
+    return user, pw
+
 # Sattumatapahtumien satunnaishaku
 def pick_random_event():
     events = []
@@ -17,7 +23,6 @@ def get_current_points_by_screen_name(screen_name):
     sql = f"""
     select points from game where screen_name = "{screen_name}";
     """
-    print(sql)
     kursori = yhteys.cursor()
     kursori.execute(sql)
     tulos = kursori.fetchall()
