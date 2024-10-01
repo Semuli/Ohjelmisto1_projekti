@@ -1,4 +1,4 @@
-#Hakee 4 lentokenttää 4 eri ilmansuunnasta
+#Hakee 4 lentokenttää 4 eri ilmansuunnasta. 10-20 deg atm mitat. 1 deg about 110km.
 def get_4_random_airports():
     def get_current_location():
         sql = f'SELECT location FROM game;'
