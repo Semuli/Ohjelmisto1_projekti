@@ -8,6 +8,18 @@ def sql_user_and_password():
     pw = input('SQL Password: ')
     return user, pw
 
+user, pw = sql_user_and_password()
+
+# sql yhteys
+yhteys = mysql.connector.connect(
+         host = '127.0.0.1',
+         port = 3306,
+         database = 'demo_game',
+         user = user,
+         password = pw,
+         autocommit = True
+         )
+
 # Sattumatapahtumien satunnaishaku
 def pick_random_event():
     events = []
@@ -27,7 +39,7 @@ def get_current_points_by_screen_name(screen_name):
     kursori.execute(sql)
     tulos = kursori.fetchall()
     if len(tulos) > 0:
-        print(f'Pisteesi tällä hetkellä {tulos[0]}')
+        print(f'Pisteesi tällä hetkellä {tulos[0][0]}')
     else: # tämä on ehkä turha
         print('Pisteesi tällä hetkellä: 0')
 
@@ -46,13 +58,3 @@ def update_game_current_location(newLocation):
 
 def distance_between_airfields(airfield1, airfield2):
     print("dapetidap")
-
-# sql yhteys ???
-yhteys = mysql.connector.connect(
-         host = '127.0.0.1',
-         port = 3306,
-         database = 'demo_game',
-         user = user,
-         password = password,
-         autocommit = True
-         )
