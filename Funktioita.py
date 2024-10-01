@@ -1,4 +1,4 @@
-#Hakee 4 lentokenttää 4 eri ilmansuunnasta
+#Hakee 4 lentokenttää 4 eri ilmansuunnasta. 10-20 deg atm mitat. 1 deg about 110km.
 def get_4_random_airports():
     def get_current_location():
         sql = f'SELECT location FROM game;'
@@ -49,3 +49,8 @@ def get_4_random_airports():
     location_west = get_random_locations_east_west(-20,-10)
 
     return location_north, location_south, location_east, location_west
+
+# Laskee lopulliset pisteet (kertoimet[vakiot] tulee vielä kokeilla)
+def calculate_final_points(points, distance_travelled):
+    final_points = points - (distance_travelled // 2_000)
+    return final_points
