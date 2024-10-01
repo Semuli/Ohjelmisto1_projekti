@@ -36,4 +36,5 @@ def check_trophy_status():
         status = False
         print(f"Sinulla on {current[0][0]} matkamuistoa. Tarvitset vielä "
               f"{max[0][0]-current[0][0]} lisää.")
+
     return status
