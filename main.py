@@ -1,6 +1,7 @@
 import csv
 import random
 
+# Sattumatapahtumien satunnaishaku
 def pick_random_event():
     events = []
     with open('events.csv', 'r', encoding='utf-8') as file:
