@@ -1,7 +1,7 @@
 #Tyhjentää datan game-taulusta:
 def clear_game_data():
     clear = (f'DELETE FROM game;')
-    print(clear)
+    #print(clear)
     cursor = connection.cursor()
     cursor.execute(clear)
     return
@@ -10,7 +10,7 @@ def clear_game_data():
 def create_new_game(player):
     new_game = (f'INSERT INTO game(id,screen_name,points,travel_distance,location,start_location,max_trophy,current_trophy) '
                 f'VALUES(1,"{player}",0,0,"EFHK","EFHK",7,0);')
-    print(new_game)
+    #print(new_game)
     cursor = connection.cursor()
     cursor.execute(new_game)
     return

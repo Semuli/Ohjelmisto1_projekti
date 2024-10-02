@@ -36,7 +36,7 @@ def get_location_distance_name_country(location_list,num):
     else:
         random_num = random.randint(0,len(location_list)-1)
         location =location_list[random_num]
-        location_distance = distance.distance(current_location_cordinates, get_location_cordinates_by_ident(location[0])).meters
+        location_distance = distance.distance(get_current_location_cordinates(), get_location_cordinates_by_ident(location[0])).meters
         location_name = get_airport_name_country_by_ident(location[0])
         print(f"{num}. {location_name[0][0]} {location_name[0][1]} {float(location_distance)/1000:.2f}km")
         return location, location_distance
@@ -110,7 +110,7 @@ def TOP_10_PLAYERS():
     kursori.execute(sql)
     result = kursori.fetchall()
     return result
-
+"""
 command = input("Do you want to know the TOP-10 players? \nEnter Y = yes or N = no \n: ").upper()
 while command != 'Y' and command != 'N':
     print("Please enter Y or N")
@@ -122,3 +122,4 @@ if command == "Y":
         print(f"Name: {player[0]}, Points: {player[1]}")
 elif command == "N":
     enter = input("press enter")
+"""
