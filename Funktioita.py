@@ -1,54 +1,82 @@
-#Hakee 4 lentokenttää 4 eri ilmansuunnasta. 10-20 deg atm mitat. 1 deg about 110km.
-def get_4_random_airports():
-    def get_current_location():
-        sql = f'SELECT location FROM game;'
-        cursor = connection.cursor()
-        cursor.execute(sql)
-        current_location = cursor.fetchall()
-        return current_location
+#Hakee 5 lentokenttää 4 eri ilmansuunnasta ja yhden samalta mantereelta. Kysyy pelaajalta mihin kohteeseen haluua matkustaa ja palauttaa arvoina kohdekentän "ident" ja matka metreinä.
+#10-20 deg atm mitat. 1 deg about 110km.
 
-    def get_location_cordinates_by_icao(icao):
-        sql = f'SELECT latitude_deg, longitude_deg FROM airport WHERE ident = "{icao}"'
-        cursor = connection.cursor()
-        cursor.execute(sql)
-        location_cordinates = cursor.fetchall()
-        return location_cordinates
+#hakee nykyisen sijainnin koordinaatit
+def get_current_location_cordinates():
+    sql = f'SELECT latitude_deg, longitude_deg FROM airport WHERE ident in(SELECT location FROM game);'
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    current_location_cordinates = cursor.fetchall()
+    return current_location_cordinates
+#hakee ident:in avulla koordinaatit
+def get_location_cordinates_by_ident(ident):
+    sql = f'SELECT latitude_deg, longitude_deg FROM airport WHERE ident = "{ident}"'
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    location_cordinates = cursor.fetchall()
+    return location_cordinates
+#hakee listan random kenttiä. 1.arvo on joko latitude tai longtitude, ja seuraavat on min ja max arvot joilla haetaan.
+def get_random_location(deg,min,max):
+    sql = f'SELECT ident FROM airport WHERE {deg} > {min} AND {deg} < {max};'
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    random_location = cursor.fetchall()
+    return random_location
+#hakee ident:in avulla lentokentän nimen ja maan missä sijaitsee
+def get_airport_name_country_by_ident(ident):
+    sql = f'SELECT airport.name AS airport, country.name AS country FROM airport, country WHERE ident = "{ident}" AND airport.iso_country = country.iso_country;'
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    airport_name_country = cursor.fetchall()
+    return airport_name_country
+#Valitsee listalta yhden kentän randomilla, tulostaa kentän nimen, maan ja etäisyyden(KM)
+def get_location_distance_name_country(location_list,num):
+    if location_list[0] == None:
+        print("Ei kenttiä tässä suunnassa.")
+    else:
+        random_num = random.randint(0,len(location_list)-1)
+        location =location_list[random_num]
+        location_distance = distance.distance(current_location_cordinates, get_location_cordinates_by_ident(location[0])).meters
+        location_name = get_airport_name_country_by_ident(location[0])
+        print(f"{num}. {location_name[0][0]} {location_name[0][1]} {float(location_distance)/1000:.2f}km")
+        return location, location_distance
+#Hakee listan samalla mantereella olevista lentokentistä
+def get_location_on_same_continent():
+    sql = f'SELECT ident FROM airport WHERE continent IN (SELECT continent FROM airport WHERE ident IN( SELECT location FROM game));'
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    random_location = cursor.fetchall()
+    return random_location
+#hakee 5 random kenttää. Tulostaa vaihtoehdot ja kysyy käyttäjältä mihin haluaa matkustaa. Käyttäjän vastauksen mukaan palauttaa vain valitun kentän "ident" ja etäisyys nykyiseen(M)
+def get_5_random_location():
+    current_location_cordinates = get_current_location_cordinates()
+    location_north_list = get_random_location("latitude_deg",str(float(current_location_cordinates[0][0]+10)),str(float(current_location_cordinates[0][0]+20)))
+    location_north = get_location_distance_name_country(location_north_list,1)
+    location_south_list = get_random_location("latitude_deg",str(float(current_location_cordinates[0][0]-20)),str(float(current_location_cordinates[0][0]-10)))
+    location_south = get_location_distance_name_country(location_south_list,2)
+    location_east_list = get_random_location("longitude_deg",str(float(current_location_cordinates[0][1]+10)),str(float(current_location_cordinates[0][1]+20)))
+    location_east = get_location_distance_name_country(location_east_list,3)
+    location_west_list = get_random_location("longitude_deg",str(float(current_location_cordinates[0][1]-20)),str(float(current_location_cordinates[0][1]-10)))
+    location_west = get_location_distance_name_country(location_west_list,4)
+    location_continent_list = get_location_on_same_continent()
+    location_continent = get_location_distance_name_country(location_continent_list,5)
+    vastaus = 0
+    while vastaus not in ['1','2','3','4','5']:
+        vastaus = input("Mihin kohteeseen haluat matkustaa?: (1-5)")
+        if vastaus == "1":
+            return location_north
+        elif vastaus == "2":
+            return location_south
+        elif vastaus == "3":
+            return location_west
+        elif vastaus == "4":
+            return location_east
+        elif vastaus == "5":
+            return location_west
+        else:
+            print("väärä syöte!")
 
-    def get_random_locations_nort_south(min,max):
-        def get_random_locations(min, max):
-            sql = f'SELECT ident FROM airport WHERE latitude_deg > "{min}" AND latitude_deg < "{max}";'
-            cursor = connection.cursor(dictionary=True)
-            cursor.execute(sql)
-            airport_north = cursor.fetchall()
-            return airport_north
-        airports = get_random_locations(str(float(current_latitude)+min),str(float(current_latitude)+max))
-        randomnum = random.randint(0, len(airports))
-        airport = airports[randomnum]
-        return airport
-
-    def get_random_locations_east_west(min,max):
-        def get_random_locations(min, max):
-            sql = f'SELECT ident FROM airport WHERE longitude_deg > "{min}" AND longitude_deg < "{max}";'
-            cursor = connection.cursor(dictionary=True)
-            cursor.execute(sql)
-            airport_north = cursor.fetchall()
-            return airport_north
-        airports = get_random_locations(str(float(current_longitude)+min),str(float(current_longitude)+max))
-        randomnum = random.randint(0, len(airports))
-        airport = airports[randomnum]
-        return airport
-
-    current_location = get_current_location()
-    current_location_cordinates = get_location_cordinates_by_icao(current_location[0][0])
-    current_latitude = current_location_cordinates[0][0]
-    current_longitude = current_location_cordinates[0][1]
-
-    location_north = get_random_locations_nort_south(10,20)
-    location_south = get_random_locations_nort_south(-20,-10)
-    location_east = get_random_locations_east_west(10,20)
-    location_west = get_random_locations_east_west(-20,-10)
-
-    return location_north, location_south, location_east, location_west
+location = get_5_random_location()
 
 # Laskee lopulliset pisteet (kertoimet[vakiot] tulee vielä kokeilla)
 def calculate_final_points(points, distance_travelled):
