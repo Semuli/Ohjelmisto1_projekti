@@ -1,6 +1,11 @@
 import csv
 import random
 import mysql.connector
+import game_and_status
+import Funktioita
+import random
+import text
+import time
 
 # kirjautuminen
 def sql_user_and_password():
@@ -56,3 +61,40 @@ yhteys = mysql.connector.connect(
          password = password,
          autocommit = True
          )
+
+#PELIN INTRO:
+print('Tervetuloa "Souvenir Collector"-peliin!')
+screen_name = input("Syötä nimesi, jotta voimme täyttää matkadokumenttisi.\n: ")
+print()
+story_choice = input("Haluatko lukea pelin tarinan? (Kyllä/En)\n: ")
+if story_choice.lower() == "kyllä":
+    text.print_story(screen_name)
+
+time.sleep(1) #Lyhyt paussi
+print()
+text.print_instructions()
+
+#PELIN ALOITUS:
+start = input('Aloita peli painamalla "Enter": ')
+print()
+
+game_and_status.clear_game_data()
+game_and_status.create_new_game(screen_name)
+max_trophies_collected = False
+
+#LOOPPI ALKAA TÄSTÄ:
+while max_trophies_collected == False:
+    selected_location = Funktioita.get_5_random_location()
+    #update_game_current_location(selected_location)
+    #gained_distance = distance_between_airfields(airfield1, airfield2)
+    #update_game_distance_travelled(gained_distance)
+    print()
+    event = pick_random_event()
+    if event['type'] == 'positive':
+        event_points = random.randint(1,25)
+    else:
+        event_points = random.randint(-25,-1)
+    event_text = event['string']
+    print("Miten matkakohteessa meni?:\n"+event_text + "\n" + str(event_points) + " pistettä")
+    print()
+    #update_game_points(event_points)
