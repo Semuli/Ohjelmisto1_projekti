@@ -22,7 +22,7 @@ def get_current_points_by_screen_name(screen_name):
     sql = f"""
     select points from game where screen_name = "{screen_name}";
     """
-    kursori = yhteys.cursor()
+    kursori = connection.cursor()
     kursori.execute(sql)
     tulos = kursori.fetchall()
     if len(tulos) > 0:
