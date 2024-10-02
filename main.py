@@ -7,12 +7,6 @@ import random
 import text
 import time
 
-# kirjautuminen
-def sql_user_and_password():
-    user = input('SQL user: ')
-    pw = input('SQL Password: ')
-    return user, pw
-
 # Sattumatapahtumien satunnaishaku
 def pick_random_event():
     events = []
@@ -52,13 +46,17 @@ def update_game_current_location(newLocation):
 def distance_between_airfields(airfield1, airfield2):
     print("dapetidap")
 
-# sql yhteys ???
-yhteys = mysql.connector.connect(
+# sql connection
+user = input('SQL user: ')
+pw = input('SQL Password: ')
+db_name = input('SQL database name: ')
+
+connection = mysql.connector.connect(
          host = '127.0.0.1',
          port = 3306,
-         database = 'demo_game',
+         database = db_name,
          user = user,
-         password = password,
+         password = pw,
          autocommit = True
          )
 
