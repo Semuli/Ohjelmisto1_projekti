@@ -76,7 +76,19 @@ def get_5_random_location():
         else:
             print("väärä syöte!")
 
+
+#tämä funkkito lisää tietokantaan uuden kentän "ident" ja kuljetun matkan (m)
+def set_new_location_and_distance(ident,distance):
+    sql = f'UPDATE game SET location = "{ident}", travel_distance = travel_distance + {distance};'
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    return
+'''
+#esimerkki millä saa 5 random kenttää ja kysyy käyttäjältä mihin liikutaan. ja lisää tarvittavat tiedot tietokantaan
+
 location = get_5_random_location()
+set_new_location_and_distance(location[0][0],int(location[1]))
+'''
 
 # Laskee lopulliset pisteet (kertoimet[vakiot] tulee vielä kokeilla)
 def calculate_final_points(points, distance_travelled):
