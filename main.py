@@ -139,8 +139,13 @@ def update_game_current_trophy(currentTrophy, gameId):
     connection.commit()
     cursor.close()
 
-def update_game_distance_travelled(distance):
-    print("dap")
+# Päivittää kuljetun matkan
+def update_game_distance_travelled(distance, gameId):
+    sql = "UPDATE game SET travel_distance = %s WHERE id = %s;"
+    cursor = connection.cursor()
+    cursor.execute(sql, (distance, gameId))
+    connection.commit()
+    cursor.close()
 
 # Päivittää tämänhetkisen sijainnin
 def update_game_current_location(currentLocation, gameId):
