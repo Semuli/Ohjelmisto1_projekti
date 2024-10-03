@@ -309,8 +309,9 @@ while max_trophies_collected == False:
 
 points_data, distance_travelled = get_points_and_travelled_distance()
 final_score = int(calculate_final_points(float(points_data), float(distance_travelled)))
+print()
 print(f"Matkasi on nyt tullut päätökseen, ja olet palannut kotiin.\n"
       f"Keräsit yhteensä {points_data} pistettä, mutta matkasi pituus,\n"
       f"joka oli {distance_travelled} kilometriä, vähensi pisteitäsi.")
 print()
-print(f"Lopullinen pistemääräsi siis on:" + int(final_score))
+print(f"Lopullinen pistemääräsi siis on {final_score:.0f}")
