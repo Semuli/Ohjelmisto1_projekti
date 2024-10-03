@@ -155,8 +155,10 @@ def update_game_current_location(currentLocation, gameId):
     connection.commit()
     cursor.close()
 
+# Laskee etäisyyden (syötteet koordinaattitupleina)
 def distance_between_airfields(airfield1, airfield2):
-    print("dapetidap")
+    distance_between = distance.distance(airfield1, airfield2)
+    return distance_between.kilometers
 
 #Laskee matkamuiston pistearvon
 #aloituslentokentän ja tämän hetkisen lentokentän välisen etäisyyden avulla:
