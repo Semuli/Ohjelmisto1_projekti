@@ -123,8 +123,13 @@ def get_current_points_by_screen_name(screen_name):
     else: # tämä on ehkä turha
         print('Pisteesi tällä hetkellä: 0')
 
-def update_game_points(points):
-    print("dapdap")
+# Päivittää pisteet
+def update_game_points(newPoints, gameId):
+    sql = "UPDATE game SET points = %s WHERE id = %s;"
+    cursor = connection.cursor()
+    cursor.execute(sql, (newPoints, gameId))
+    connection.commit()
+    cursor.close()
 
 def update_game_trophy(trophy):
     print("dapdap")
