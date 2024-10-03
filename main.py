@@ -205,6 +205,23 @@ def check_trophy_status():
 
     return status
 
+def get_points_and_travelled_distance():
+    select_points_and_travel_distance = f'SELECT points,travel_distance FROM game WHERE game.id = 1;'
+    #print(select_points_and_travel_distance)
+    cursor = connection.cursor() #(dictionary=True)
+    cursor.execute(select_points_and_travel_distance)
+    points_and_travel_distance = cursor.fetchall()
+    points_data = points_and_travel_distance[0][0]
+    #print(points_data)
+    travel_distance_data = points_and_travel_distance[0][1]
+    #print(travel_distance_data)
+    return points_data, travel_distance_data
+
+# Laskee lopulliset pisteet (kertoimet[vakiot] tulee vielä kokeilla)
+def calculate_final_points(points, distance_travelled):
+    final_points = points - (distance_travelled // 2_000)
+    return final_points
+
 
 # sql connection
 user = input('SQL user: ')
@@ -232,13 +249,13 @@ story_choice = input("Haluatko lukea pelin tarinan? (Kyllä/En)\n: ")
 if story_choice.lower() == "kyllä":
     print()
     text.print_story(screen_name)
-print()
+    print()
+
 show_instructions = input('Paina "Enter" jatkaaksesi\n')
 print()
 text.print_instructions()
 
 #PELIN ALOITUS:
-print()
 start = input('Aloita peli painamalla "Enter"\n')
 
 clear_game_data()
@@ -250,47 +267,50 @@ while max_trophies_collected == False:
     print()
     print("Tässä on kohteet joihin voit matkata. Valitse yksi:")
     print()
-    selected_location = get_5_random_location()
-    #update_game_current_location(selected_location)
-    #gained_distance = distance_between_airfields(airfield1, airfield2)
-    #update_game_distance_travelled(gained_distance)
+    airport1_coordinates = get_current_location_cordinates() #Hakee 1. lentokentän etäisyyden laskemiseen
+    airport1_input = airport1_coordinates[0][0], airport1_coordinates[0][1]
+    selected_location = get_5_random_location() #Tehdään valinta uudesta lentokentästä
+    print(selected_location)
+    update_game_current_location(selected_location[0][0], 1) #Tallennetaan...
+    airport2_coordinates = get_current_location_cordinates() #Hakee nyt 2. lentokentän etäisyyden laskemiseen
+    airport2_input = airport2_coordinates[0][0], airport2_coordinates[0][1]
+    gained_distance = distance_between_airfields(airport1_input, airport2_input)
+    update_game_distance_travelled(gained_distance, 1)
     print()
+
     event = pick_random_event()
-    if event['type'] == 'positive':
-        event_points = random.randint(1,25)
-    else:
-        event_points = random.randint(-25,-1)
     event_text = event['string']
-    print("Miten matkakohteessa meni?:\n"+event_text + "\n" + str(event_points) + " pistettä")
+    event_points = event['points']
+    print(f"Miten matkakohteessa meni?:\n{event_text} {str(event_points)} pistettä.")
     print()
-    #update_game_points(event_points)
+    update_game_points(event_points,1)
     time.sleep(0.25)
+
     collect_trophy = input("Haluatko ottaa mukaasi matkamuiston tästä kohteesta? (Kyllä/En)\n"
                            "Voit jatkaa seuraavaan kohteeseen keräämättä matkamuistoa, jos haluat.\n: ")
     if collect_trophy.lower() == "kyllä":
         calculate_trophy_points()
-        #update_current_trophy()
+        update_game_current_trophy(+1,1)
     else:
         print("Et ottanut matkamuistoa mukaasi.")
-    #print(check_trophy_status())
+    print(check_trophy_status())
     print()
     time.sleep(0.5)
+
     if max_trophies_collected != True:
         print("Ennen kuin jatkat matkaasi seuraavaan kohteeseen, haluat varmaan tietää,\n"
           "paljonko pisteitä sinulla on.")
         print()
         get_current_points_by_screen_name(screen_name)
-        print()
-        print("Kohti seuraavaa kohdetta!")
     time.sleep(1)
+    max_trophies_collected = True
 
 #LOOPPI LOPPU
 
-#points_data = get_points() #Tarvitsee funktion...
-#distance_travelled = get_travel_distance() #Tarvitsee funktion...
-#final_score = calculate_final_points(distance_travelled,points_data)
-#print(f"Olet palannut takaisin kotiin, ja matkasi on nyt tullut päätökseen.\n"
-    #  f"Keräsit yhteensä {points_data} pistettä, mutta matkasi pituus,\n"
-   #   f"joka oli {distance_travelled} kilometriä, vähensi pisteitäsi.")
+points_data, distance_travelled = get_points_and_travelled_distance()
+final_score = int(calculate_final_points(float(points_data), float(distance_travelled)))
+print(f"Matkasi on nyt tullut päätökseen, ja olet palannut kotiin.\n"
+      f"Keräsit yhteensä {points_data} pistettä, mutta matkasi pituus,\n"
+      f"joka oli {distance_travelled} kilometriä, vähensi pisteitäsi.")
 print()
-#print(f"Lopullinen pistemääräsi siis on: {final_score}")
+print(f"Lopullinen pistemääräsi siis on:" + int(final_score))
