@@ -104,13 +104,11 @@ def get_5_random_location():
 
 # Sattumatapahtumien satunnaishaku
 def pick_random_event():
-    events = []
-    with open('events.csv', 'r', encoding='utf-8') as file:
-        csvfile = csv.reader(file)
-        for row in csvfile:
-            events.append(row)
-        event = events[random.randint(0, len(events) - 1)]
-        return {"type": event[0], "string": event[1]}
+    sql = "SELECT text, points FROM random_events ORDER BY RAND() LIMIT 1;"
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    res = cursor.fetchone()
+    return {"points": res[1], "string": res[0]}
 
 # hakee tämänhetkiset pisteet (kunhan ne on päivitetty tietokantaan oikein)
 def get_current_points_by_screen_name(screen_name):
