@@ -301,7 +301,7 @@ while max_trophies_collected == False:
         print("Ennen kuin jatkat matkaasi seuraavaan kohteeseen, haluat varmaan tietää,\n"
           "paljonko pisteitä sinulla on.")
         print()
-        get_current_points_by_screen_name(screen_name)
+        get_current_points_by_screen_name(screen_name) #Hmmmm...
     time.sleep(1)
     max_trophies_collected = True
 
