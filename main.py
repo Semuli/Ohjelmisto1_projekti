@@ -1,8 +1,5 @@
-import csv
-import random
 from geopy import distance
 import mysql.connector
-import Funktioita
 import random
 import text
 import time
@@ -119,7 +116,7 @@ def get_current_points_by_screen_name(screen_name):
     kursori.execute(sql)
     tulos = kursori.fetchall()
     if len(tulos) > 0:
-        print(f'Pisteesi tällä hetkellä {tulos[0]}')
+        print(f'Pisteesi tällä hetkellä: {tulos[0][0]}')
     else: # tämä on ehkä turha
         print('Pisteesi tällä hetkellä: 0')
 
@@ -197,7 +194,8 @@ def check_trophy_status():
     current = cursor.fetchall()
     if max == current:
         status = True
-        print(f"Hienoa! Olet kerännyt kaikki {max[0][0]} matkamuistoa!")
+        print(f"Hienoa! Olet kerännyt kaikki {max[0][0]} matkamuistoa!\n"
+              f"Kotia kohti!")
     else:
         status = False
         print(f"Sinulla on {current[0][0]} matkamuistoa. Tarvitset vielä "
@@ -219,8 +217,22 @@ def get_points_and_travelled_distance():
 
 # Laskee lopulliset pisteet (kertoimet[vakiot] tulee vielä kokeilla)
 def calculate_final_points(points, distance_travelled):
-    final_points = points - (distance_travelled // 2_000)
+    final_points = points - (distance_travelled // 500)
     return final_points
+
+def scoreboard_screen_name_and_points(name,points):
+    sql = f"INSERT INTO scoreboard (Screen_name, Scrore) VALUES ('{name}','{points}')"
+    kursori = connection.cursor()
+    kursori.execute(sql)
+    connection.commit()
+    return
+
+def TOP_10_PLAYERS():
+    sql = f"Select Screen_name, Scrore from scoreboard order by Scrore desc limit 10"
+    kursori = connection.cursor()
+    kursori.execute(sql)
+    result = kursori.fetchall()
+    return result
 
 
 # sql connection
@@ -261,6 +273,9 @@ start = input('Aloita peli painamalla "Enter"\n')
 clear_game_data()
 create_new_game(screen_name)
 max_trophies_collected = False
+points = 0
+current_trophy = 0
+travel_distance = 0
 
 #LOOPPI ALKAA TÄSTÄ:
 while max_trophies_collected == False:
@@ -270,12 +285,12 @@ while max_trophies_collected == False:
     airport1_coordinates = get_current_location_cordinates() #Hakee 1. lentokentän etäisyyden laskemiseen
     airport1_input = airport1_coordinates[0][0], airport1_coordinates[0][1]
     selected_location = get_5_random_location() #Tehdään valinta uudesta lentokentästä
-    print(selected_location)
     update_game_current_location(selected_location[0][0], 1) #Tallennetaan...
     airport2_coordinates = get_current_location_cordinates() #Hakee nyt 2. lentokentän etäisyyden laskemiseen
     airport2_input = airport2_coordinates[0][0], airport2_coordinates[0][1]
     gained_distance = distance_between_airfields(airport1_input, airport2_input)
-    update_game_distance_travelled(gained_distance, 1)
+    travel_distance = travel_distance + gained_distance
+    update_game_distance_travelled(travel_distance, 1)
     print()
 
     event = pick_random_event()
@@ -283,27 +298,45 @@ while max_trophies_collected == False:
     event_points = event['points']
     print(f"Miten matkakohteessa meni?:\n{event_text} {str(event_points)} pistettä.")
     print()
-    update_game_points(event_points,1)
+    points = points + event_points
+    update_game_points(points,1)
     time.sleep(0.25)
 
     collect_trophy = input("Haluatko ottaa mukaasi matkamuiston tästä kohteesta? (Kyllä/En)\n"
                            "Voit jatkaa seuraavaan kohteeseen keräämättä matkamuistoa, jos haluat.\n: ")
     if collect_trophy.lower() == "kyllä":
-        calculate_trophy_points()
-        update_game_current_trophy(+1,1)
+        trophy_points = calculate_trophy_points()
+        points = points + trophy_points
+        update_game_points(points, 1)
+        current_trophy = current_trophy + 1
+        update_game_current_trophy(current_trophy,1)
     else:
         print("Et ottanut matkamuistoa mukaasi.")
-    print(check_trophy_status())
+    max_trophies_collected = check_trophy_status()
     print()
-    time.sleep(0.5)
+    continue_game = input('Paina "Enter"\n')
 
     if max_trophies_collected != True:
+        print()
         print("Ennen kuin jatkat matkaasi seuraavaan kohteeseen, haluat varmaan tietää,\n"
           "paljonko pisteitä sinulla on.")
         print()
-        get_current_points_by_screen_name(screen_name) #Hmmmm...
-    time.sleep(1)
-    max_trophies_collected = True
+        get_current_points_by_screen_name(screen_name)
+        print()
+        time.sleep(1)
+        continue_game = input('Paina "Enter"\n')
+    else:
+        airport1_coordinates = get_current_location_cordinates()
+        airport1_input = airport1_coordinates[0][0], airport1_coordinates[0][1]
+        update_game_current_location("EFHK", 1)
+        airport2_coordinates = get_current_location_cordinates()
+        airport2_input = airport2_coordinates[0][0], airport2_coordinates[0][1]
+        gained_distance = distance_between_airfields(airport1_input, airport2_input)
+        travel_distance = travel_distance + gained_distance
+        update_game_distance_travelled(travel_distance, 1)
+
+
+
 
 #LOOPPI LOPPU
 
@@ -312,6 +345,24 @@ final_score = int(calculate_final_points(float(points_data), float(distance_trav
 print()
 print(f"Matkasi on nyt tullut päätökseen, ja olet palannut kotiin.\n"
       f"Keräsit yhteensä {points_data} pistettä, mutta matkasi pituus,\n"
-      f"joka oli {distance_travelled} kilometriä, vähensi pisteitäsi.")
+      f"joka oli n.{float(distance_travelled):.0f} kilometriä, vähensi pisteitäsi.")
 print()
-print(f"Lopullinen pistemääräsi siis on {final_score:.0f}")
+print(f"Lopullinen pistemääräsi siis on {final_score:.0f}!")
+scoreboard_screen_name_and_points(screen_name,final_score)
+
+show_scoreboard = input("Haluatko nähdä, miten muiden matkat ovat onnistuneet? (Kyllä/En)\n: ")
+if show_scoreboard.lower() == "kyllä":
+    print()
+    print("Tässä on parhaiten onnistuneet matkat:")
+    print()
+    scoreboard = TOP_10_PLAYERS()
+    position = 0
+    for player in scoreboard:
+        name = player[0]
+        score = player[1]
+        position = position + 1
+        print(f"-------------------------------------------\n"
+              f" {position}. | {name} | {score} |")
+print("----------------------------------------")
+print()
+print("Kiitos, kun pelasit!")

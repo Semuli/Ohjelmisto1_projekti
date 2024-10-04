@@ -110,7 +110,7 @@ def TOP_10_PLAYERS():
     kursori.execute(sql)
     result = kursori.fetchall()
     return result
-"""
+
 command = input("Do you want to know the TOP-10 players? \nEnter Y = yes or N = no \n: ").upper()
 while command != 'Y' and command != 'N':
     print("Please enter Y or N")
@@ -122,4 +122,3 @@ if command == "Y":
         print(f"Name: {player[0]}, Points: {player[1]}")
 elif command == "N":
     enter = input("press enter")
-"""
