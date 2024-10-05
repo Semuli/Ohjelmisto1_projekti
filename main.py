@@ -43,24 +43,26 @@ def get_random_location(deg,min,max):
     cursor = connection.cursor()
     cursor.execute(sql)
     random_location = cursor.fetchall()
+    if len(random_location) == 0:
+        random_location = get_location_on_same_continent()
     return random_location
 #hakee ident:in avulla lentokentän nimen ja maan missä sijaitsee
 def get_airport_name_country_by_ident(ident):
-    sql = f'SELECT airport.name AS airport, country.name AS country FROM airport, country WHERE ident = "{ident}" AND airport.iso_country = country.iso_country;'
+    sql = f'SELECT airport.name AS airport, country.name AS country, airport.continent FROM airport, country WHERE ident = "{ident}" AND airport.iso_country = country.iso_country;'
     cursor = connection.cursor()
     cursor.execute(sql)
     airport_name_country = cursor.fetchall()
     return airport_name_country
 #Valitsee listalta yhden kentän randomilla, tulostaa kentän nimen, maan ja etäisyyden(KM)
 def get_location_distance_name_country(location_list,num):
-    if location_list[0] == None:
+    if len(location_list) == 0:
         print("Ei kenttiä tässä suunnassa.")
     else:
         random_num = random.randint(0,len(location_list)-1)
         location =location_list[random_num]
         location_distance = distance.distance(get_current_location_cordinates(), get_location_cordinates_by_ident(location[0])).meters
         location_name = get_airport_name_country_by_ident(location[0])
-        print(f"{num}. {location_name[0][0]} {location_name[0][1]} {float(location_distance)/1000:.2f}km")
+        print(f"{num}. {location_name[0][0]} {location_name[0][1]} {location_name [0][2]} {float(location_distance)/1000:.2f}km")
         return location, location_distance
 #Hakee listan samalla mantereella olevista lentokentistä
 def get_location_on_same_continent():
@@ -82,10 +84,9 @@ def get_5_random_location():
     location_west = get_location_distance_name_country(location_west_list,4)
     location_continent_list = get_location_on_same_continent()
     location_continent = get_location_distance_name_country(location_continent_list,5)
-    print()
     vastaus = 0
     while vastaus not in ['1','2','3','4','5']:
-        vastaus = input("Mihin kohteeseen haluat matkustaa? (1-5)\n: ")
+        vastaus = input("Mihin kohteeseen haluat matkustaa?: (1-5)")
         if vastaus == "1":
             return location_north
         elif vastaus == "2":
@@ -95,9 +96,16 @@ def get_5_random_location():
         elif vastaus == "4":
             return location_east
         elif vastaus == "5":
-            return location_west
+            return location_continent
         else:
             print("väärä syöte!")
+
+#tämä funkkito lisää tietokantaan uuden kentän "ident" ja kuljetun matkan (m)
+def set_new_location_and_distance(ident,distance):
+    sql = f'UPDATE game SET location = "{ident}", travel_distance = travel_distance + {distance};'
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    return
 
 # Sattumatapahtumien satunnaishaku
 def pick_random_event():
