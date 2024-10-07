@@ -53,7 +53,7 @@ def get_airport_name_country_by_ident(ident):
     return airport_name_country
 #Valitsee listalta yhden kentän randomilla, tulostaa kentän nimen, maan ja etäisyyden(KM)
 def get_location_distance_name_country(location_list,num):
-    if location_list[0] == None:
+    if not location_list:
         print("Ei kenttiä tässä suunnassa.")
     else:
         random_num = random.randint(0,len(location_list)-1)
