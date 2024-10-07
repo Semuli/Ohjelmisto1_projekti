@@ -266,6 +266,7 @@ show_instructions = input('Paina "Enter" jatkaaksesi\n')
 print()
 text.print_instructions()
 
+
 #PELIN ALOITUS:
 start = input('Aloita peli painamalla "Enter"\n')
 
