@@ -220,14 +220,14 @@ def calculate_final_points(points, distance_travelled):
     return final_points
 
 def scoreboard_screen_name_and_points(name,points):
-    sql = f"INSERT INTO scoreboard (Screen_name, Scrore) VALUES ('{name}','{points}')"
+    sql = f"INSERT INTO scoreboard (Screen_name, Score) VALUES ('{name}','{points}')"
     kursori = connection.cursor()
     kursori.execute(sql)
     connection.commit()
     return
 
 def TOP_10_PLAYERS():
-    sql = f"Select Screen_name, Scrore from scoreboard order by Scrore desc limit 10"
+    sql = f"Select Screen_name, Score from scoreboard order by Score desc limit 10"
     kursori = connection.cursor()
     kursori.execute(sql)
     result = kursori.fetchall()
